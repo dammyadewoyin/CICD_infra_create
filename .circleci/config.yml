@@ -137,7 +137,7 @@ jobs:
           # Similarly, you can create and use $OldStackID environment variable in place of production-distro 
           command: |
             export OldBucketID=$(cat ~/textfile.txt)
-            aws s3 rm "s3://{OldBucketID}" --recursive
+            aws s3 rm "s3://mybucket528676232774" --recursive
 # Sequential workflow
 workflows:
   # Name the workflow
