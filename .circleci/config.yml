@@ -13,36 +13,41 @@ jobs:
     #steps:
       #- checkout # check out the code in the project directory
       #- run: echo "hello world" # run the `echo` command
-  create_infrastructure: 
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Create Cloudformation Stack
-          command: |
-            aws cloudformation deploy \
-            --template-file template.yml \
-            --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-            --region us-east-1
-  #configure_infrastructure: 
+  #create_infrastructure: 
     #docker:
-      #- image: python:3.7-alpine3.11
+      #- image: amazon/aws-cli
     #steps:
       #- checkout
-      #- add_ssh_keys:
+      #- run:
+          #name: Create Cloudformation Stack
+          #command: |
+            #aws cloudformation deploy \
+            #--template-file template.yml \
+            #--stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+            #--region us-east-1
+  configure_infrastructure: 
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
           # You can get this ID in the section where you registered the SSH Key
-          #fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
-      #- run:
-          #name: Install Ansible
-          #command: |
+          fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
+      - run:
+          name: Install Ansible
+          command: |
             # Install Ansible
-            #apk add --update ansible
-      #- run:
-          #name: Run Playbook and Configure server
-          #command: |
+            apk add --update ansible
+      - run:
+          name: Install dependencies
+          command: |
+            #install open ssh
+            apk add --update openssh-client git
+      - run:
+          name: Run Playbook and Configure server
+          command: |
             # Your command
-            #ansible-playbook -i inventory main-remote.yml 
+            ansible-playbook -i inventory main-remote.yml 
 # Sequential workflow
 workflows:
   # Name the workflow
@@ -50,5 +55,5 @@ workflows:
     jobs:
       #- myjob1
       #- myjob2
-      - create_infrastructure
-      #- configure_infrastructure
+      #- create_infrastructure
+      - configure_infrastructure
