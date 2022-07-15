@@ -2,31 +2,53 @@ version: 2.1
 # Use a package of configuration called an orb.
 orbs:
   # Choose either one of the orbs below
-  welcome: circleci/welcome-orb@0.4.1
-  #aws-cli: circleci/aws-cli@2.0.3
+  # welcome: circleci/welcome-orb@0.4.1
+  aws-cli: circleci/aws-cli@2.0.3
 # Define the jobs we want to run for this project
 jobs:
-  configure_infrastructure: 
+  #myjob1:  # Choose any name, such as `build`
+    # The primary container, where your job's commands will run
+    #docker:
+      #- image: 
+    #steps:
+      #- checkout # check out the code in the project directory
+      #- run: echo "hello world" # run the `echo` command
+  create_infrastructure: 
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       - checkout
-      - add_ssh_keys:
+      - run:
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+            --template-file template.yml \
+            --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+            --region us-east-1
+  #configure_infrastructure: 
+    #docker:
+      #- image: python:3.7-alpine3.11
+    #steps:
+      #- checkout
+      #- add_ssh_keys:
           # You can get this ID in the section where you registered the SSH Key
-          fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
-      - run:
-          name: Install Ansible
-          command: |
+          #fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
+      #- run:
+          #name: Install Ansible
+          #command: |
             # Install Ansible
-            apk add --update ansible
-      - run:
-          name: Run Playbook and Configure server
-          command: |
+            #apk add --update ansible
+      #- run:
+          #name: Run Playbook and Configure server
+          #command: |
             # Your command
-            ansible-playbook -i inventory main-remote.yml 
+            #ansible-playbook -i inventory main-remote.yml 
 # Sequential workflow
 workflows:
   # Name the workflow
-  damiWorkflow:
+  myWorkflow:
     jobs:
-      - configure_infrastructure
+      #- myjob1
+      #- myjob2
+      - create_infrastructure
+      #- configure_infrastructure
