@@ -25,29 +25,45 @@ jobs:
             #--template-file template.yml \
             #--stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
             #--region us-east-1
-  configure_infrastructure: 
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
+  #configure_infrastructure: 
+    #docker:
+      #- image: python:3.7-alpine3.11
+    #steps:
+      #- checkout
+      #- add_ssh_keys:
           # You can get this ID in the section where you registered the SSH Key
-          fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
-      - run:
-          name: Install Ansible
-          command: |
+          #fingerprints: ["d2:d9:95:91:58:fe:3e:45:84:d3:14:6a:8e:54:b3:9d"] 
+      #- run:
+          #name: Install Ansible
+          #command: |
             # Install Ansible
-            apk add --update ansible
-      - run:
-          name: Install dependencies
-          command: |
+            #apk add --update ansible
+      #- run:
+          #name: Install dependencies
+          #command: |
             #install open ssh
-            apk add --update openssh-client git
-      - run:
-          name: Run Playbook and Configure server
-          command: |
+            #apk add --update openssh-client git
+      #- run:
+          #name: Run Playbook and Configure server
+          #command: |
             # Your command
-            ansible-playbook -i inventory main-remote.yml 
+            #ansible-playbook -i inventory main-remote.yml 
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test
+          command: |
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
 # Sequential workflow
 workflows:
   # Name the workflow
@@ -56,4 +72,5 @@ workflows:
       #- myjob1
       #- myjob2
       #- create_infrastructure
-      - configure_infrastructure
+      #- configure_infrastructure
+      - smoke_test
